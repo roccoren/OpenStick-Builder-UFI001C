@@ -1,10 +1,24 @@
-*.raw
+# OpenStick-Builder generated files
+files/
+rootfs/
+kernel_dl/
+mnt/
+rootfs.raw
+boot.raw
+rootfs.tgz
+dist/
 *.bin
-*.zip
 *.mbn
-*.tgz
-build
-dist
-files
-mnt
-rootfs
+*.img
+*.apk
+*.zip
+# Build artifacts
+src/lk2nd/build/
+src/qhypstub/build/
+src/qtestsign/build/
+src/gt/build/
+src/libusbgx/build/
+# OS files
+.vscode/
+__pycache__/
+*.pyc

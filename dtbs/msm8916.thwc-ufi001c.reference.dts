@@ -1,0 +1,74 @@
+// SPDX-License-Identifier: GPL-2.0-only
+//
+// UFI-001C / UFI-001B 4G Modem Stick 设备树
+// 此文件是参考源文件，编译后的 .dtb 会被放入 /boot/dtbs/qcom/
+//
+// 来源: Linux 主线内核 (torvalds/linux)
+// https://github.com/torvalds/linux/blob/master/arch/arm64/boot/dts/qcom/msm8916-thwc-ufi001c.dts
+//
+// 依赖: msm8916-ufi.dtsi (见同目录下另一文件)
+
+/dts-v1/;
+
+#include "msm8916-ufi.dtsi"
+
+/ {
+	model = "ufi-001c/ufi-001b 4G Modem Stick";
+	compatible = "thwc,ufi001c", "qcom,msm8916";
+};
+
+&button_restart {
+	gpios = <&tlmm 37 GPIO_ACTIVE_HIGH>;
+};
+
+&led_b {
+	gpios = <&tlmm 20 GPIO_ACTIVE_HIGH>;
+};
+
+&led_g {
+	gpios = <&tlmm 21 GPIO_ACTIVE_HIGH>;
+};
+
+&led_r {
+	gpios = <&tlmm 22 GPIO_ACTIVE_HIGH>;
+};
+
+&mpss {
+	pinctrl-0 = <&sim_ctrl_default>;
+	pinctrl-names = "default";
+};
+
+&button_default {
+	pins = "gpio37";
+	bias-pull-down;
+};
+
+&gpio_leds_default {
+	pins = "gpio20", "gpio21", "gpio22";
+};
+
+/* 默认选择外部 SIM 卡槽 */
+&tlmm {
+	sim_ctrl_default: sim-ctrl-default-state {
+		esim-sel-pins {
+			pins = "gpio0", "gpio3";
+			function = "gpio";
+			bias-disable;
+			output-low;
+		};
+
+		sim-en-pins {
+			pins = "gpio1";
+			function = "gpio";
+			bias-disable;
+			output-low;
+		};
+
+		sim-sel-pins {
+			pins = "gpio2";
+			function = "gpio";
+			bias-disable;
+			output-high;
+		};
+	};
+};
