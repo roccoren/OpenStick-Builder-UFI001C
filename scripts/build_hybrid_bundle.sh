@@ -487,6 +487,9 @@ fastboot flash aboot aboot.bin
 fastboot flash cdt sbc_1.0_8016.bin
 fastboot erase boot || true
 fastboot erase rootfs || true
+fastboot reboot
+sleep 8
+fastboot devices
 fastboot flash boot boot.img
 fastboot flash rootfs rootfs.img
 fastboot reboot
