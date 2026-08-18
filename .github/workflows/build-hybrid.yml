@@ -1,0 +1,60 @@
+name: Build UFI001C Hybrid Debian 13
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+    paths:
+      - '.github/workflows/build-hybrid.yml'
+      - 'scripts/build_hybrid_bundle.sh'
+      - 'configs/**'
+      - 'dtbs/**'
+      - 'scripts/msm-firmware-loader.sh'
+      - 'README-HYBRID-GITHUB-ACTIONS.md'
+
+jobs:
+  build-hybrid:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Install host dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            debootstrap \
+            qemu-user-static \
+            fakeroot \
+            unzip \
+            wget \
+            curl \
+            e2fsprogs \
+            xz-utils \
+            ca-certificates
+
+      - name: Build hybrid bundle
+        run: |
+          bash scripts/build_hybrid_bundle.sh
+
+      - name: List artifacts
+        run: |
+          find out/artifacts -maxdepth 2 -type f -printf '%P\t%s\n' | sort
+
+      - name: Upload artifact directory
+        uses: actions/upload-artifact@v4
+        with:
+          name: ufi001c-debian13-hybrid-slim-dir
+          path: out/artifacts/ufi001c-debian13-hybrid-slim-*/
+          if-no-files-found: error
+
+      - name: Upload zip bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: ufi001c-debian13-hybrid-slim-zip
+          path: out/artifacts/*.zip
+          if-no-files-found: error
