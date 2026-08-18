@@ -496,7 +496,8 @@ fastboot reboot
 sleep 8
 fastboot devices
 fastboot flash boot boot.bin
-fastboot flash rootfs rootfs.bin
+echo '[INFO] Using -S 128M to avoid host-side sparse read issues on some fastboot builds'
+fastboot -S 128M flash rootfs rootfs.bin
 fastboot reboot
 EOF
   chmod 755 "$PKGDIR/flash_from_fastboot.sh"

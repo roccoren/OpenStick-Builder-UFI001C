@@ -12,6 +12,7 @@ This repository now includes a GitHub Actions workflow for building a **UFI001C 
 A ZIP bundle containing:
 - `boot.bin`
 - `rootfs.bin`
+  - On some Windows fastboot builds, flash `rootfs.bin` with `fastboot -S 128M flash rootfs rootfs.bin`
 - `gpt_both0.bin`
 - `aboot.bin`
 - `hyp.mbn`
