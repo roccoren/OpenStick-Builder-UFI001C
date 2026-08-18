@@ -34,6 +34,7 @@ jobs:
             wget \
             curl \
             e2fsprogs \
+            android-sdk-libsparse-utils \
             xz-utils \
             ca-certificates
 

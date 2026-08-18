@@ -418,8 +418,10 @@ create_artifacts() {
   log "Create flashable image bundle"
   local bootstage="$STAGING/boot"
   local rootstage="$STAGING/rootfs"
-  local bootimg="$PKGDIR/boot.img"
-  local rootimg="$PKGDIR/rootfs.img"
+  local bootraw="$STAGING/boot.img"
+  local rootraw="$STAGING/rootfs.img"
+  local bootsparse="$PKGDIR/boot.bin"
+  local rootsparse="$PKGDIR/rootfs.bin"
   local zipfile="$ARTIFACTS/$IMAGE_NAME.zip"
 
   rm -rf "$PKGDIR" "$STAGING"
@@ -437,14 +439,17 @@ create_artifacts() {
   mkdir -p "$rootstage/boot" "$rootstage/dev" "$rootstage/proc" "$rootstage/sys" "$rootstage/run" "$rootstage/tmp"
   chmod 1777 "$rootstage/tmp" "$rootstage/var/tmp"
 
-  export bootstage rootstage bootimg rootimg
+  export bootstage rootstage bootraw rootraw
   fakeroot bash -c '
     set -e
     chown -hR 0:0 "$bootstage" "$rootstage"
     chown -hR 1000:1000 "$rootstage/home/user"
-    mkfs.ext2 -F -b 1024 -L boot -m 0 -d "$bootstage" "$bootimg" 65536
-    mkfs.ext4 -F -b 4096 -L rootfs -m 0 -d "$rootstage" "$rootimg" 327680
+    mkfs.ext2 -F -b 1024 -L boot -m 0 -d "$bootstage" "$bootraw" 65536
+    mkfs.ext4 -F -b 4096 -L rootfs -m 0 -d "$rootstage" "$rootraw" 327680
   '
+  img2simg "$bootraw" "$bootsparse"
+  img2simg "$rootraw" "$rootsparse"
+  rm -f "$bootraw" "$rootraw"
 
   cp "$LEGACY_DIR/base/gpt_both0.bin" "$PKGDIR/"
   cp "$LEGACY_DIR/base/aboot.bin" "$PKGDIR/"
@@ -459,7 +464,7 @@ create_artifacts() {
 #!/usr/bin/env bash
 set -euo pipefail
 cd "$(dirname "$0")"
-for f in gpt_both0.bin aboot.bin hyp.mbn rpm.mbn sbl1.mbn tz.mbn sbc_1.0_8016.bin boot.img rootfs.img; do
+for f in gpt_both0.bin aboot.bin hyp.mbn rpm.mbn sbl1.mbn tz.mbn sbc_1.0_8016.bin boot.bin rootfs.bin; do
   [ -f "$f" ] || { echo "missing: $f"; exit 1; }
 done
 read -r -p 'Continue and modify the device partition table? [yes/NO] ' ans
@@ -490,8 +495,8 @@ fastboot erase rootfs || true
 fastboot reboot
 sleep 8
 fastboot devices
-fastboot flash boot boot.img
-fastboot flash rootfs rootfs.img
+fastboot flash boot boot.bin
+fastboot flash rootfs rootfs.bin
 fastboot reboot
 EOF
   chmod 755 "$PKGDIR/flash_from_fastboot.sh"
@@ -509,6 +514,7 @@ This bundle contains a **Debian 13 (Trixie)** rootfs combined with a **postmarke
 ## Notes
 - The partition table is modified.
 - Keep backups of board-specific modem state partitions whenever possible.
+- Use `boot.bin` and `rootfs.bin` for fastboot flashing.
 - The first boot generates missing SSH host keys and finishes system setup.
 EOF
 

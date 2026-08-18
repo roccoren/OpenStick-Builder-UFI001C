@@ -10,8 +10,8 @@ This repository now includes a GitHub Actions workflow for building a **UFI001C 
 
 ## What the workflow produces
 A ZIP bundle containing:
-- `boot.img`
-- `rootfs.img`
+- `boot.bin`
+- `rootfs.bin`
 - `gpt_both0.bin`
 - `aboot.bin`
 - `hyp.mbn`
